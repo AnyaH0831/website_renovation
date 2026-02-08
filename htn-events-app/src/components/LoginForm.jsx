@@ -21,12 +21,12 @@ function LoginForm({onLogin}) {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-4">Login to View Private Events</h2>
+        <div className="max-w-md mx-auto mt-8 p-6 bg-ultrasonic-blue border-2 border-electric-sapphire rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold mb-4 text-sky-aqua">Login to View Private Events</h2>
         
         <form onSubmit={handleSubmit}>
             <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Username</label>
+            <label className="block text-white mb-2">Username</label>
             <input
                 type="text"
                 value={username}
@@ -36,7 +36,7 @@ function LoginForm({onLogin}) {
             </div>
 
             <div className="mb-4">
-            <label className="block text-gray-700 mb-2">Password</label>
+            <label className="block text-white mb-2">Password</label>
             <input
                 type="password"
                 value={password}
@@ -49,7 +49,7 @@ function LoginForm({onLogin}) {
 
             <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
+            className="w-full bg-neon-pink text-white py-2 rounded-md hover:bg-raspberry-plum"
             >
             Login
             </button>
