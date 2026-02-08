@@ -15,6 +15,8 @@ function App() {
   const [showLoginForm, setShowLoginForm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
+  const [currentPage, setCurrentPage] = useState(1);
+  const [eventsPerPage, setEventsPerPage] = useState(9);
 
   const {isLoggedIn, login, logout} = useAuth();
 
@@ -47,6 +49,11 @@ function App() {
       clearTimeout(timer);
     };
   }, [searchQuery])
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedQuery, isLoggedIn, eventsPerPage]);
 
   
 
@@ -91,12 +98,18 @@ function App() {
       //        event.event_type.toLowerCase().includes(query);
     
   }
+
+  // Pagination logic
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
+  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
    
 
   return (
     <div className="min-h-screen bg-black font-mono">
       {/* Navigation Bar */}
-      <nav className="bg-gray-900 border-b-2 border-sky-aqua shadow-sm">
+      <nav className="bg-gray-900 shadow-sm relative">
         <div className="container mx-auto px-4 py-2 max-w-7xl flex flex-wrap justify-between items-center gap-2">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>Hack the North Events</h1>
           
@@ -131,6 +144,15 @@ function App() {
             )}
           </div>
         </div>
+        {/* Animated gradient menu border */}
+        <div 
+          style={{
+            height: '2px',
+            background: 'linear-gradient(90deg, #f72585, #4361ee, #4cc9f0, #4361ee, #f72585)',
+            backgroundSize: '200% 100%',
+            animation: 'gradient-shift 4s ease infinite'
+          }}
+        />
       </nav>
 
       {/* Login Form Modal */}
@@ -148,8 +170,28 @@ function App() {
         </div>
       )}
 
+
+      {/* Pagination */}
       <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <p className="text-sky-aqua mb-8">Showing {filteredEvents.length} events</p>
+        <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
+          <p className="text-sky-aqua">Showing {currentEvents.length} of {filteredEvents.length} events</p>
+          
+          <div className="flex items-center gap-2">
+            <label className="text-sky-aqua text-sm">Events per page:</label>
+            <select
+              value={eventsPerPage}
+              onChange={function(e) { setEventsPerPage(Number(e.target.value)) }}
+              className="px-3 py-1 bg-gray-800 text-white border border-electric-sapphire rounded focus:outline-none focus:border-sky-aqua"
+            >
+              <option value={6}>6</option>
+              <option value={9}>9</option>
+              <option value={12}>12</option>
+              <option value={18}>18</option>
+              <option value={30}>30</option>
+              <option value={filteredEvents.length}>All</option>
+            </select>
+          </div>
+        </div>
 
         {filteredEvents.length === 0 ? (
           <div className="text-center py-16">
@@ -157,11 +199,37 @@ function App() {
             <p className="text-blue-energy">Try adjusting your search</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredEvents.map(event => (
-              <EventCard key={event.id} event={event} allEvents={events} isLoggedIn={isLoggedIn} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {currentEvents.map(event => (
+                <EventCard key={event.id} event={event} allEvents={events} isLoggedIn={isLoggedIn} />
+              ))}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex justify-center items-center gap-4 mt-8">
+                <button
+                  onClick={function() { setCurrentPage(currentPage - 1) }}
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-electric-sapphire text-white rounded hover:bg-blue-energy disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+                
+                <span className="text-sky-aqua font-mono">
+                  Page {currentPage} of {totalPages}
+                </span>
+                
+                <button
+                  onClick={function() { setCurrentPage(currentPage + 1) }}
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-electric-sapphire text-white rounded hover:bg-blue-energy disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </>
         )}
         
       </div>
