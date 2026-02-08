@@ -100,7 +100,7 @@ function App() {
         <div className="container mx-auto px-4 py-2 max-w-7xl flex flex-wrap justify-between items-center gap-2">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>Hack the North Events</h1>
           
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 ml-auto">
             {/* Search Input */}
             <div className="relative">
               <input
