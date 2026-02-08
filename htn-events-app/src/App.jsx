@@ -151,8 +151,8 @@ function App() {
       <nav className="bg-gray-900 shadow-sm relative">
         <div className="container mx-auto px-4 py-2 max-w-7xl flex flex-wrap justify-between items-center gap-2">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>
-            <span className="hidden sm:inline">Hack the North Events</span>
-            <span className="sm:hidden">HTN Events</span>
+            <span className="hidden sm:inline">Hackathon Global Inc.™ Events</span>
+            <span className="sm:hidden">HGI™ Events</span>
           </h1>
           
           <div className="flex items-center gap-2 sm:gap-4 ml-auto">
