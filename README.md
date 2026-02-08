@@ -27,7 +27,7 @@
    - Better user experience as it allows typos
 - Vercel for Deployment
 
-### Problems Encountered
+#### Problems Encountered
 
 
 
