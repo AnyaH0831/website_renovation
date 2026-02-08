@@ -14,6 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [showLoginForm, setShowLoginForm] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
 
   const {isLoggedIn, login, logout} = useAuth();
 
@@ -36,10 +37,28 @@ function App() {
     getEvents();
   }, [])
 
+  // Debounced search - wait 300ms after user stops typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchQuery])
+
   
 
   if (loading) {
-    return <div>Loading events...</div>
+    return (
+      <div className="min-h-screen bg-black font-mono flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-aqua mb-4"></div>
+          <p className="text-sky-aqua text-lg">Loading events...</p>
+        </div>
+      </div>
+    )
   }
 
   let filteredEvents;
@@ -50,7 +69,7 @@ function App() {
   }
 
   // Fuzzy search
-  if (searchQuery) {
+  if (debouncedQuery) {
 
     const fuse = new Fuse(filteredEvents, {
         keys: [
@@ -78,18 +97,18 @@ function App() {
     <div className="min-h-screen bg-black font-mono">
       {/* Navigation Bar */}
       <nav className="bg-ultrasonic-blue border-b-2 border-sky-aqua shadow-sm">
-        <div className="container mx-auto px-4 py-1 max-w-7xl flex justify-between items-center">
-          <h1 className="text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>Hack the North Events</h1>
+        <div className="container mx-auto px-4 py-2 max-w-7xl flex flex-wrap justify-between items-center gap-2">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>Hack the North Events</h1>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             {/* Search Input */}
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search events..."
+                placeholder="Search..."
                 value={searchQuery}
                 onChange={function(e) { setSearchQuery(e.target.value) }}
-                className="px-4 py-1 bg-vivid-royal text-white border border-electric-sapphire rounded focus:outline-none focus:border-neon-pink placeholder-sky-aqua"
+                className="w-32 sm:w-48 md:w-64 px-2 sm:px-4 py-1 text-sm bg-vivid-royal text-white border border-electric-sapphire rounded focus:outline-none focus:border-neon-pink placeholder-sky-aqua"
               />
             </div>
 
@@ -97,7 +116,7 @@ function App() {
             {!isLoggedIn && (
               <button
                 onClick={function() { setShowLoginForm(true) }}
-                className="px-4 py-1 bg-neon-pink text-white rounded hover:bg-raspberry-plum transition-colors"
+                className="px-3 sm:px-4 py-1 text-sm sm:text-base bg-neon-pink text-white rounded hover:bg-raspberry-plum transition-colors whitespace-nowrap"
               >
                 Login
               </button>
@@ -105,7 +124,7 @@ function App() {
             {isLoggedIn && (
               <button
                 onClick={logout}
-                className="px-4 py-2 bg-raspberry-plum text-white rounded hover:bg-indigo-bloom transition-colors"
+                className="px-3 sm:px-4 py-1 sm:py-2 text-sm sm:text-base bg-raspberry-plum text-white rounded hover:bg-indigo-bloom transition-colors whitespace-nowrap"
               >
                 Logout
               </button>
@@ -132,11 +151,18 @@ function App() {
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         <p className="text-sky-aqua mb-8">Showing {filteredEvents.length} events</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredEvents.map(event => (
-            <EventCard key={event.id} event={event} allEvents={events} isLoggedIn={isLoggedIn} />
-          ))}
-        </div>
+        {filteredEvents.length === 0 ? (
+          <div className="text-center py-16">
+            <h3 className="text-xl font-semibold text-white mb-2">No Events Found :C</h3>
+            <p className="text-blue-energy">Try adjusting your search</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredEvents.map(event => (
+              <EventCard key={event.id} event={event} allEvents={events} isLoggedIn={isLoggedIn} />
+            ))}
+          </div>
+        )}
         
       </div>
     </div>
