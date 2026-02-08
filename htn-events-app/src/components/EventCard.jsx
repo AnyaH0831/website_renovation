@@ -48,7 +48,7 @@ function EventCard({ event, allEvents, isLoggedIn }) {
     return (
         <div
             id={'event-' + event.id}
-            className="bg-ultrasonic-blue border-2 border-electric-sapphire rounded-lg p-6 shadow-sm hover:border-neon-pink transition-all">
+            className="bg-gray-900 border-2 border-electric-sapphire rounded-lg p-6 shadow-sm hover:border-neon-pink transition-all">
             <h3 className="text-xl font-bold mb-2 text-sky-aqua">{event.name}</h3>
             
             <div className="flex gap-3 mb-3">

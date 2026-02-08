@@ -96,7 +96,7 @@ function App() {
   return (
     <div className="min-h-screen bg-black font-mono">
       {/* Navigation Bar */}
-      <nav className="bg-ultrasonic-blue border-b-2 border-sky-aqua shadow-sm">
+      <nav className="bg-gray-900 border-b-2 border-sky-aqua shadow-sm">
         <div className="container mx-auto px-4 py-2 max-w-7xl flex flex-wrap justify-between items-center gap-2">
           <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>Hack the North Events</h1>
           
@@ -108,7 +108,7 @@ function App() {
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={function(e) { setSearchQuery(e.target.value) }}
-                className="w-32 sm:w-48 md:w-64 px-2 sm:px-4 py-1 text-sm bg-vivid-royal text-white border border-electric-sapphire rounded focus:outline-none focus:border-neon-pink placeholder-sky-aqua"
+                className="w-32 sm:w-48 md:w-64 px-2 sm:px-4 py-1 text-sm bg-gray-800 text-white border border-electric-sapphire rounded focus:outline-none focus:border-neon-pink placeholder-sky-aqua"
               />
             </div>
 
