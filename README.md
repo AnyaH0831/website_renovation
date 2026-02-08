@@ -74,6 +74,7 @@
 
 2. Debounced Search Implementation
       - Instead of instant search as the users are typing, here applied a 0.3s delay after the user stopped typing.
+   
    ```javascript
       useEffect(() => {
         const timer = setTimeout(() => {
