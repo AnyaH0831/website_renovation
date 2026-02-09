@@ -1,206 +1,27 @@
-import { useState, useEffect } from 'react';
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
-import { fetchEvents } from './services/api';
-import EventCard from './components/EventCard';
-import {useAuth} from './hooks/useAuth';
-import LoginForm from './components/LoginForm';
-import Fuse from 'fuse.js';
-// import EventCard from './components/EventCard'
+import { useState } from 'react';
+import Hero from './components/Hero';
+import Timeline from './components/Timeline';
+import ProjectCard from './components/ProjectCard';
+import { heroData, timelineItems, sideProjects } from './data/portfolioData';
 
 function App() {
-  //To store events data
-  const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true)
-  const [showLoginForm, setShowLoginForm] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [debouncedQuery, setDebouncedQuery] = useState('')
-  const [currentPage, setCurrentPage] = useState(1);
-  const [eventsPerPage, setEventsPerPage] = useState(9);
-  const [highlightedEventId, setHighlightedEventId] = useState(null);
-
-  const {isLoggedIn, login, logout} = useAuth();
-
-  //When components load, fetchevents
-  useEffect(() => {
-    const getEvents = async () => {
-      try{
-        const data = await fetchEvents();
-        // console.log('Fetched events:', data);
-        const sortedData = data.sort((a,b) => a.start_time - b.start_time)
-        console.log(sortedData)
-        setEvents(sortedData);
-        setLoading(false);
-      }catch (error){
-        console.error('Error:', error);
-        setLoading(false);
-      }
-    }
-
-    getEvents();
-  }, [])
-
-  // Debounced search - wait 300ms after user stops typing
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [searchQuery])
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedQuery, isLoggedIn, eventsPerPage]);
-
-  // Scroll to top when page changes
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage]);
-
-  
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-black font-mono flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-sky-aqua mb-4"></div>
-          <p className="text-sky-aqua text-lg">Loading events...</p>
-        </div>
-      </div>
-    )
-  }
-
-  let filteredEvents;
-  if (isLoggedIn){
-    filteredEvents = events;
-  }else{
-    filteredEvents = events.filter(event => event.permission === 'public')
-  }
-
-  // Fuzzy search
-  if (debouncedQuery) {
-
-    const fuse = new Fuse(filteredEvents, {
-        keys: [
-          'name',
-          'description',
-          'event_type'
-        ],
-        threshold: 0.4,
-        ignoreLocation: true
-      });
-
-    const results = fuse.search(searchQuery);
-
-    filteredEvents = results.map(function(result) {
-      return result.item;
-    })
-      // return event.name.toLowerCase().includes(query) ||
-      //        event.description.toLowerCase().includes(query) ||
-      //        event.event_type.toLowerCase().includes(query);
-    
-  }
-
-  // Pagination logic
-  const indexOfLastEvent = currentPage * eventsPerPage;
-  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
-  const currentEvents = filteredEvents.slice(indexOfFirstEvent, indexOfLastEvent);
-  const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
-
-  // Handle related event click: navigate to correct page and smooth scroll
-  const handleRelatedEventClick = (eventId) => {
-    const eventIndex = filteredEvents.findIndex(function(e) {
-      return e.id === eventId;
-    });
-
-    if (eventIndex !== -1) {
-      const targetPage = Math.ceil((eventIndex + 1) / eventsPerPage);
-      
-      if (targetPage !== currentPage) {
-        setCurrentPage(targetPage);
-      }
-
-      // Set highlight and scroll
-      setHighlightedEventId(eventId);
-
-      // Wait for page to update before scrolling
-      setTimeout(function() {
-        const element = document.getElementById('event-' + eventId);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 100);
-    }
-  };
-   
-
   return (
-    <div 
-      className="min-h-screen bg-black font-mono"
-      onClick={function() { 
-        if (highlightedEventId) {
-          setHighlightedEventId(null);
-        }
-      }}
-    >
+    <div className="min-h-screen bg-black font-mono">
       {/* Navigation Bar */}
-      <nav className="bg-gray-900 shadow-sm relative">
-        <div className="container mx-auto px-4 py-2 max-w-7xl flex flex-wrap justify-between items-center gap-2">
-          <h1 className="text-lg sm:text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>
-            <span className="hidden sm:inline">Hackathon Global Inc.™ Events</span>
-            <span className="sm:hidden">HGI™ Events</span>
+      <nav className="fixed top-0 left-0 right-0 bg-gray-900 shadow-sm z-50">
+        <div className="container mx-auto px-4 py-4 max-w-7xl flex justify-between items-center">
+          <h1 className="text-xl md:text-2xl font-bold font-mono text-raspberry-plum drop-shadow-[0_0_2px_#f72585]" style={{WebkitTextStroke: '1px #4cc9f0'}}>
+            Anya Huang
           </h1>
           
-          <div className="flex items-center gap-2 sm:gap-4 ml-auto">
-            {/* Search Input */}
-            <div className="relative">
-              <svg className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-sky-aqua pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={function(e) { setSearchQuery(e.target.value) }}
-                className="w-32 sm:w-48 md:w-64 pl-8 pr-8 py-1 text-sm bg-gray-800 text-white border border-electric-sapphire rounded focus:outline-none focus:border-neon-pink placeholder-sky-aqua"
-              />
-              {searchQuery && (
-                <button
-                  onClick={function() { setSearchQuery('') }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-neon-pink hover:text-raspberry-plum transition-colors"
-                  aria-label="Clear search"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
-
-            {/* Login/Logout Button */}
-            {!isLoggedIn && (
-              <button
-                onClick={function() { setShowLoginForm(true) }}
-                className="px-3 sm:px-4 py-1 text-sm sm:text-base bg-neon-pink text-white rounded hover:bg-raspberry-plum transition-colors whitespace-nowrap"
-              >
-                Login
-              </button>
-            )}
-            {isLoggedIn && (
-              <button
-                onClick={logout}
-                className="px-3 sm:px-4 py-1 sm:py-2 text-sm sm:text-base bg-raspberry-plum text-white rounded hover:bg-indigo-bloom transition-colors whitespace-nowrap"
-              >
-                Logout
-              </button>
-            )}
+          <div className="flex items-center gap-6">
+            <a href="#hero" className="text-sky-aqua hover:text-neon-pink transition-colors">Home</a>
+            <a href="#timeline" className="text-sky-aqua hover:text-neon-pink transition-colors">Journey</a>
+            <a href="#projects" className="text-sky-aqua hover:text-neon-pink transition-colors">Projects</a>
+            <a href="#contact" className="text-sky-aqua hover:text-neon-pink transition-colors">Contact</a>
           </div>
         </div>
-        {/* Animated gradient menu border */}
+        {/* Animated gradient border */}
         <div 
           style={{
             height: '2px',
@@ -208,94 +29,74 @@ function App() {
             backgroundSize: '200% 100%',
             animation: 'gradient-shift 4s ease infinite'
           }}
-        />
+        ></div>
       </nav>
 
-      {/* Login Form Modal */}
-      {!isLoggedIn && showLoginForm && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="relative">
-            <button
-              onClick={function() { setShowLoginForm(false) }}
-              className="absolute top-2 right-2 text-sky-aqua hover:text-neon-pink"
-            >
-              ✕
-            </button>
-            <LoginForm onLogin={login} />
-          </div>
-        </div>
-      )}
-
-
-      {/* Pagination */}
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
-        <div className="flex flex-wrap justify-between items-center mb-8 gap-4">
-          <p className="text-sky-aqua">Showing {currentEvents.length} of {filteredEvents.length} events</p>
-          
-          <div className="flex items-center gap-2">
-            <label className="text-sky-aqua text-sm">Events per page:</label>
-            <select
-              value={eventsPerPage}
-              onChange={function(e) { setEventsPerPage(Number(e.target.value)) }}
-              className="px-3 py-1 bg-gray-800 text-white border border-electric-sapphire rounded focus:outline-none focus:border-sky-aqua"
-            >
-              <option value={6}>6</option>
-              <option value={9}>9</option>
-              <option value={12}>12</option>
-              <option value={18}>18</option>
-              <option value={30}>30</option>
-              <option value={filteredEvents.length}>All</option>
-            </select>
-          </div>
-        </div>
-
-        {filteredEvents.length === 0 ? (
-          <div className="text-center py-16">
-            <h3 className="text-xl font-semibold text-white mb-2">No Events Found :C</h3>
-            <p className="text-blue-energy">Try adjusting your search</p>
-          </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {currentEvents.map(event => (
-                <EventCard 
-                  key={event.id} 
-                  event={event} 
-                  allEvents={events} 
-                  isLoggedIn={isLoggedIn}
-                  onRelatedEventClick={handleRelatedEventClick}
-                  isHighlighted={highlightedEventId === event.id}
-                />
-              ))}
-            </div>
-
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center gap-4 mt-8">
-                <button
-                  onClick={function() { setCurrentPage(currentPage - 1) }}
-                  disabled={currentPage === 1}
-                  className="px-4 py-2 bg-electric-sapphire text-white rounded hover:bg-blue-energy disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Previous
-                </button>
-                
-                <span className="text-sky-aqua font-mono">
-                  Page {currentPage} of {totalPages}
-                </span>
-                
-                <button
-                  onClick={function() { setCurrentPage(currentPage + 1) }}
-                  disabled={currentPage === totalPages}
-                  className="px-4 py-2 bg-electric-sapphire text-white rounded hover:bg-blue-energy disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </>
-        )}
-        
+      {/* Hero Section */}
+      <div id="hero">
+        <Hero data={heroData} />
       </div>
+
+      {/* Timeline Section */}
+      <div id="timeline">
+        <Timeline items={timelineItems} />
+      </div>
+
+      {/* Side Projects Section */}
+      <section id="projects" className="bg-black py-20 px-4">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 font-mono">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric-sapphire to-sky-aqua">
+              Side Projects
+            </span>
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {sideProjects.map(function(project) {
+              return <ProjectCard key={project.id} project={project} />;
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="bg-gray-900 py-20 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-8 font-mono">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-pink to-electric-sapphire">
+              Get In Touch
+            </span>
+          </h2>
+          
+          <p className="text-xl text-gray-300 mb-8">
+            I'm always open to new opportunities and collaborations. Feel free to reach out!
+          </p>
+
+          <div className="flex justify-center gap-4 flex-wrap">
+            <a
+              href={`mailto:${heroData.links.email}`}
+              className="px-8 py-4 bg-neon-pink text-white rounded-lg hover:bg-raspberry-plum transition-colors text-lg font-mono"
+            >
+              Send Email
+            </a>
+            <a
+              href={heroData.links.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-8 py-4 bg-electric-sapphire text-white rounded-lg hover:bg-blue-energy transition-colors text-lg font-mono"
+            >
+              LinkedIn
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-black py-8 text-center border-t border-gray-800">
+        <p className="text-gray-500">
+          © 2026 Anya Huang. Built with React + Vite + Tailwind CSS
+        </p>
+      </footer>
     </div>
   )
 }
